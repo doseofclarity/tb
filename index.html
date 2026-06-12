@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tuberculosis (TB) Study Guide | PHN Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .flip-card:hover .flip-inner { transform: rotateY(180deg); }
+        .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover, .recall-mode .reveal-text.revealed {
+            background-color: #fde047;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .locked-section { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { tb: { light: '#ecfdf5', DEFAULT: '#0f766e', dark: '#064e3b', accent: '#d97706' } } } }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-tb-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40"><i class="fa-solid fa-bars text-2xl"></i></button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none"><i class="fa-solid fa-lungs mr-2 text-tb-light"></i> Tuberculosis</h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-tb-dark to-tb text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-lungs text-tb-light mr-2"></i> Tuberculosis</h1>
+            <p class="text-sm text-slate-300 mt-1 font-medium">NTCP · DOTS · PHN Review</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-tb-light text-tb-dark border-r-4 border-tb-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i> Home / Start</button></li>
+                <li><button onclick="showSection('overview')" id="btn-overview" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-chart-line w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Epidemiology & Overview</button></li>
+                <li><button onclick="showSection('transmission')" id="btn-transmission" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-hand-holding-medical w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Transmission & Pathogenesis</button></li>
+                <li><button onclick="showSection('clinical')" id="btn-clinical" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-stethoscope w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Clinical & Diagnosis</button></li>
+                <li><button onclick="showSection('treatment')" id="btn-treatment" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-pills w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Treatment & DOTS</button></li>
+                <li><button onclick="showSection('prevention')" id="btn-prevention" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-syringe w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Prevention & BCG</button></li>
+                <li><button onclick="showSection('phn')" id="btn-phn" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> PHN Role & Nursing Care</button></li>
+                <li><button onclick="showSection('mnemonics')" id="btn-mnemonics" class="nav-btn w-full text-left px-6 py-3 text-slate-600 border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-brain w-6 nav-icon hidden text-tb"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Mnemonics & Key Facts</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-600 locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6 text-slate-400"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <!-- Active Recall Toggle -->
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-tb mr-1"></i> Active Recall</span>
+            <span class="mr-3 text-sm font-bold text-slate-700 md:hidden"><i class="fa-solid fa-brain text-tb"></i></span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-tb-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5"><i class="fa-solid fa-lungs text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-tb-light mb-6"><i class="fa-solid fa-biohazard text-5xl"></i></div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">Communicable Disease · NTCP</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-md">Tuberculosis<br><span class="text-3xl md:text-5xl text-tb-light">(TB)</span></h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10"><p class="text-lg font-medium">"The world's deadliest infectious disease – curable with DOTS."</p></div>
+                        <button onclick="unlockFirstSection()" class="bg-tb hover:bg-tb-dark text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto">Start Module <i class="fa-solid fa-arrow-right ml-3"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Epidemiology & Overview (PDF pages 250-252) -->
+            <section id="overview" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-chart-line text-tb mr-4"></i> Epidemiology & Overview</h2>
+                    <div class="bg-red-50 border-l-4 border-tb p-4 mb-6 rounded-r shadow-sm">
+                        <p><strong class="text-tb-dark">Tuberculosis (TB)</strong> – highly infectious chronic disease caused by <em>Mycobacterium tuberculosis</em>. Primarily respiratory but can affect other organs. In 1993, WHO declared TB a global emergency.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 p-5 rounded-xl border">
+                            <h3 class="font-bold text-lg mb-3"><i class="fa-solid fa-chart-simple text-tb mr-2"></i> Philippines Situation</h3>
+                            <ul class="list-disc pl-5 space-y-2 text-sm">
+                                <li>Ranks <span class="reveal-text font-bold">9th among 22 high‑burden countries</span> (WHO watchlist).</li>
+                                <li>Estimated incidence: <span class="reveal-text">243/100,000 population/year</span> (2006 report).</li>
+                                <li>TB ranks <span class="reveal-text">6th leading cause of morbidity and mortality</span> (2002).</li>
+                                <li>National TB Control Program (NTP) target: <span class="reveal-text">Cure ≥85% of smear‑positive cases; detect ≥70%</span> of estimated new cases.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-xl border">
+                            <h3 class="font-bold text-lg mb-3"><i class="fa-solid fa-biohazard text-tb mr-2"></i> Global Burden</h3>
+                            <p class="text-sm">TB remains a leading killer worldwide. Multidrug‑resistant TB (MDR‑TB) and HIV co‑infection worsen the burden. The Philippines is committed to <span class="reveal-text">MDG Goal 6: Combat HIV/AIDS, malaria and other diseases</span> (target: halt and reverse TB incidence).</p>
+                        </div>
+                    </div>
+                    <button onclick="openQuiz('overview')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors flex items-center justify-center text-lg"><i class="fa-solid fa-list-check mr-3 text-2xl text-tb"></i> Take Quiz to Unlock Next Section</button>
+                </div>
+            </section>
+
+            <!-- Transmission & Pathogenesis -->
+            <section id="transmission" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-hand-holding-medical text-tb mr-4"></i> Transmission & Pathogenesis</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-5 rounded-xl border border-red-200">
+                            <h3 class="font-bold text-lg text-red-800"><i class="fa-solid fa-lungs"></i> Mode of Transmission</h3>
+                            <ul class="list-disc pl-5 mt-2 text-sm">
+                                <li><strong>Airborne droplet nuclei</strong> – coughing, sneezing, singing, talking.</li>
+                                <li>Infectious dose: small; close contact with smear‑positive patients.</li>
+                                <li>Bovine TB: ingestion of <span class="reveal-text">unpasteurized milk</span> (rare in PH).</li>
+                                <li>Period of communicability: as long as viable bacilli in sputum; <span class="reveal-text">effective chemotherapy reduces infectivity within days to weeks</span>.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-amber-50 p-5 rounded-xl border border-amber-200">
+                            <h3 class="font-bold text-lg">Susceptibility & Risk Factors</h3>
+                            <ul class="list-disc pl-5 mt-2 text-sm">
+                                <li>Highest risk: <span class="reveal-text">Children <3 years, adolescents, elderly, immunocompromised (HIV)</span>.</li>
+                                <li>Underweight, undernourished, diabetics, silicosis, substance abusers.</li>
+                                <li>Primary infection: most remain latent; reactivation years later.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Flip card: DOTS 5 elements -->
+                    <div class="flip-card w-full md:w-2/3 mx-auto mt-6 mb-4 perspective-1000 cursor-pointer" id="flipCardDOTS">
+                        <div class="relative h-44 w-full transition-all duration-500 transform-style-3d flip-inner rounded-xl">
+                            <div class="absolute h-full w-full bg-slate-50 border-2 border-slate-300 rounded-xl shadow-md flex flex-col items-center justify-center backface-hidden"><p class="text-sm font-bold">Tap/Hover</p><h3 class="text-3xl font-black text-tb-dark">5 Elements of DOTS</h3></div>
+                            <div class="absolute h-full w-full bg-tb-dark text-white rounded-xl shadow-lg flex flex-col items-center justify-center p-4 text-center backface-hidden rotate-y-180">
+                                <p class="text-sm leading-tight">1. Political commitment<br>2. Quality-assured sputum microscopy<br>3. Standardized short‑course chemotherapy (supervised)<br>4. Uninterrupted drug supply<br>5. Recording & reporting system</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="openQuiz('transmission')" class="mt-6 w-full bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 transition-colors"><i class="fa-solid fa-list-check mr-3"></i> Take Quiz →</button>
+                </div>
+            </section>
+
+            <!-- Clinical & Diagnosis -->
+            <section id="clinical" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-stethoscope text-tb mr-4"></i> Clinical & Diagnosis</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-red-800">Signs & Symptoms (TB Symptomatic)</h3>
+                            <ul class="list-disc pl-5 text-sm mt-2">
+                                <li><span class="reveal-text">Cough ≥2 weeks</span> (most important)</li>
+                                <li>Fever, night sweats</li>
+                                <li>Chest/back pain</li>
+                                <li><span class="reveal-text">Hemoptysis or blood‑streaked sputum</span></li>
+                                <li>Significant weight loss, fatigue, malaise</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-blue-800">Diagnosis</h3>
+                            <ul class="list-disc pl-5 text-sm">
+                                <li><strong>Direct Sputum Smear Microscopy (DSSM)</strong> – primary diagnostic tool.</li>
+                                <li>Three sputum specimens (spot, morning, spot).</li>
+                                <li>Chest X‑ray (supportive, not definitive).</li>
+                                <li>TB Diagnostic Committee (TBDC) for smear‑negative cases.</li>
+                                <li>Culture & DST for MDR‑TB suspects.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 bg-cyan-50 p-4 rounded-lg border-l-4 border-cyan-600">
+                        <p class="font-bold">🔬 Case definition: </p>
+                        <p><span class="reveal-text">Smear‑positive PTB</span> – at least 2 initial sputum smears positive OR 1 positive plus CXR consistent with TB. <span class="reveal-text">Smear‑negative</span> requires TBDC evaluation.</p>
+                    </div>
+                    <button onclick="openQuiz('clinical')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl"><i class="fa-solid fa-list-check mr-3"></i> Take Quiz →</button>
+                </div>
+            </section>
+
+            <!-- Treatment & DOTS (with drug regimens) -->
+            <section id="treatment" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-pills text-tb mr-4"></i> Treatment & DOTS</h2>
+                    <div class="overflow-x-auto mb-6">
+                        <table class="min-w-full border text-sm">
+                            <thead class="bg-tb text-white"><tr><th class="p-2">Category</th><th class="p-2">Type of Patient</th><th class="p-2">Intensive Phase</th><th class="p-2">Continuation Phase</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr><td class="p-2 font-bold">I</td><td>New smear‑positive, severe smear‑negative, EPTB, HIV+</td><td class="reveal-text">2HRZE</td><td class="reveal-text">4HR</td></tr>
+                                <tr class="bg-slate-50"><td class="p-2 font-bold">II</td><td>Relapse, treatment failure, return after default</td><td class="reveal-text">2HRZES / 1HRZE</td><td class="reveal-text">5HRE</td></tr>
+                                <tr><td class="p-2 font-bold">III</td><td>New smear‑negative (minimal lesions)</td><td class="reveal-text">2HRZE</td><td class="reveal-text">4HR</td></tr>
+                                <tr class="bg-slate-50"><td class="p-2 font-bold">IV</td><td>Chronic (still smear‑positive after re‑treatment)</td><td colspan="2">Refer to DOTS Plus / MDR‑TB center</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-sm italic">H = Isoniazid, R = Rifampicin, Z = Pyrazinamide, E = Ethambutol, S = Streptomycin. Fixed‑dose combinations (FDCs) preferred.</p>
+                    <div class="bg-amber-50 p-4 rounded-lg mt-4">
+                        <i class="fa-solid fa-clock"></i> <strong>Directly Observed Therapy (DOT):</strong> No patient should start treatment without a treatment partner (health worker, BHW, family member). DOT ensures adherence and prevents resistance.
+                    </div>
+                    <button onclick="openQuiz('treatment')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl"><i class="fa-solid fa-list-check mr-3"></i> Take Quiz →</button>
+                </div>
+            </section>
+
+            <!-- Prevention & BCG -->
+            <section id="prevention" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-syringe text-tb mr-4"></i> Prevention & BCG</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><span class="reveal-text">BCG vaccination</span> – given to all infants at birth or soon after (EPI). Protective efficacy ~50% against any TB, 64% against TB meningitis, 71% against death from TB.</li>
+                        <li>Prompt diagnosis and treatment of infectious cases (source control).</li>
+                        <li>Improve ventilation, reduce overcrowding.</li>
+                        <li>Health education on cough etiquette, sputum disposal.</li>
+                        <li>Isoniazid preventive therapy (IPT) for child contacts <5 years old (with negative chest X‑ray) where resources available.</li>
+                    </ul>
+                    <div class="mt-6 bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
+                        <p class="font-bold">🏥 NTP Vision: "A country where TB is no longer a public health problem."</p>
+                    </div>
+                    <button onclick="openQuiz('prevention')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl"><i class="fa-solid fa-list-check mr-3"></i> Take Quiz →</button>
+                </div>
+            </section>
+
+            <!-- PHN Role & Nursing Care -->
+            <section id="phn" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-user-nurse text-tb mr-4"></i> PHN Role & Nursing Care</h2>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Case finding: identify TB symptomatics (cough ≥2 weeks) and refer for sputum microscopy.</li>
+                        <li>Assign and supervise a <span class="reveal-text">treatment partner</span> for DOT.</li>
+                        <li>Maintain and update TB Register (Form 1, 2, 3).</li>
+                        <li>Facilitate drug requisition and distribution; ensure no stock‑outs.</li>
+                        <li>Health education: adherence, sputum collection, cough etiquette, nutrition.</li>
+                        <li>Childhood TB: perform tuberculin testing if trained, refer for CXR, assist in child contact management.</li>
+                        <li>Coordinate with Barangay Health Workers for defaulter tracing and home visits.</li>
+                        <li>Submit quarterly reports (FHSIS) to Provincial/City Health Office.</li>
+                    </ul>
+                    <div class="bg-indigo-50 p-4 rounded-lg mt-6">
+                        <i class="fa-regular fa-hospital"></i> <strong>Linkages:</strong> PHN coordinates with TB Diagnostic Committee, Rural Health Midwives, hospitals (for sputum microscopy), and local government for political support.
+                    </div>
+                    <button onclick="openQuiz('phn')" class="mt-8 w-full bg-slate-800 text-white font-black py-4 rounded-xl"><i class="fa-solid fa-list-check mr-3"></i> Take Quiz →</button>
+                </div>
+            </section>
+
+            <!-- Mnemonics & Key Facts -->
+            <section id="mnemonics" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-black text-slate-800 mb-6 border-b-2 border-tb pb-3"><i class="fa-solid fa-brain text-tb mr-4"></i> Mnemonics & Key Facts</h2>
+                    <div class="overflow-x-auto rounded-lg border">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-slate-800 text-white"><tr><th class="p-2">Topic</th><th class="p-2">Mnemonic</th><th class="p-2">Meaning</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr><td class="p-2 font-semibold">TB symptoms</td><td class="font-black text-tb">COUGH + B</td><td class="reveal-text">Cough ≥2 weeks, Other symptoms (fever, night sweats), Unintentional weight loss, General malaise, Hemoptysis, Blood-streaked sputum</td></tr>
+                                <tr class="bg-slate-50"><td class="p-2 font-semibold">First‑line drugs</td><td class="font-black text-tb">RIPE (H)</td><td class="reveal-text">Rifampicin, Isoniazid (H), Pyrazinamide, Ethambutol</td></tr>
+                                <tr><td class="p-2 font-semibold">Category I regimen</td><td class="font-black text-tb">2HRZE / 4HR</td><td class="reveal-text">2 months intensive (daily), 4 months continuation (daily)</td></tr>
+                                <tr class="bg-slate-50"><td class="p-2 font-semibold">DOTS elements</td><td class="font-black text-tb">5 fingers</td><td class="reveal-text">Political commitment, quality microscopy, standardized short-course, drug supply, recording/reporting</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button onclick="openQuiz('final_quiz')" class="mt-8 w-full bg-amber-500 text-slate-900 font-black py-4 rounded-xl shadow-md hover:bg-amber-400"><i class="fa-solid fa-graduation-cap mr-3"></i> Take Final 50‑Item Exam</button>
+                </div>
+            </section>
+
+            <!-- Final Quiz Section -->
+            <section id="final_quiz_sec" class="content-section hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center">
+                    <i class="fa-solid fa-graduation-cap text-8xl text-amber-400 mb-6"></i>
+                    <h2 class="text-4xl font-black text-slate-800 mb-4">Final Comprehensive Exam</h2>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl">50 items covering epidemiology, transmission, clinical signs, diagnosis, treatment, DOTS, PHN responsibilities, and NTCP policies. Score ≥80% to master the module.</p>
+                    <button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 text-xl"><i class="fa-solid fa-flag-checkered mr-2"></i> Start Final Exam</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Quiz Modal -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2>
+            <p class="text-slate-600 mb-6 font-medium border-b pb-4">Score at least <span class="font-bold text-tb">80%</span> to unlock next section.</p>
+            <div id="quiz-questions-container" class="space-y-4"></div>
+            <button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-tb text-white font-bold py-4 rounded-xl hover:bg-tb-dark transition-colors shadow-lg">Submit Answers</button>
+            <div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100"></div>
+        </div>
+    </div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // ---------- QUIZ DATA (based on CHN White Book pages 250-260) ----------
+        const quizzes = {
+            overview: { title: "TB Epidemiology & Overview", next: "transmission", questions: [
+                { q: "What is the causative agent of tuberculosis?", options: ["Mycobacterium leprae", "Mycobacterium tuberculosis", "Klebsiella pneumoniae", "Streptococcus pneumoniae"], ans: 1 },
+                { q: "The Philippines ranks ___ among the 22 high-burden TB countries.", options: ["5th", "9th", "15th", "2nd"], ans: 1 },
+                { q: "Estimated TB incidence in the Philippines per 100,000 population/year (WHO 2006):", options: ["143", "243", "343", "543"], ans: 1 },
+                { q: "NTP target cure rate for smear‑positive TB:", options: ["≥70%", "≥85%", "≥95%", "100%"], ans: 1 },
+                { q: "Which MDG is directly related to TB control?", options: ["MDG 4 (child mortality)", "MDG 5 (maternal health)", "MDG 6 (combat HIV/AIDS, malaria, other diseases)", "MDG 1 (poverty)"], ans: 2 },
+                { q: "TB was declared a global emergency by WHO in:", options: ["1990", "1993", "2000", "2005"], ans: 1 },
+                { q: "In 2002, TB ranked ___ leading cause of morbidity in the Philippines.", options: ["2nd", "4th", "6th", "10th"], ans: 2 },
+                { q: "Which of the following is NOT a high-risk group for TB?", options: ["HIV positive", "Underweight", "Vaccinated with BCG", "Diabetics"], ans: 2 },
+                { q: "The most hazardous period for developing clinical disease after infection is:", options: ["First 6-12 months", "After 5 years", "First week", "Never"], ans: 0 },
+                { q: "The NTP vision is:", options: ["TB-free Philippines by 2020", "A country where TB is no longer a public health problem", "Zero TB deaths", "Eliminate TB by 2030"], ans: 1 }
+            ] },
+            transmission: { title: "Transmission & Pathogenesis", next: "clinical", questions: [
+                { q: "How is TB primarily transmitted?", options: ["Ingestion of contaminated food", "Airborne droplet nuclei", "Sexual contact", "Blood transfusion"], ans: 1 },
+                { q: "The period of communicability of TB:", options: ["Only before symptoms start", "As long as viable bacilli in sputum", "Only during the first week", "Only after treatment ends"], ans: 1 },
+                { q: "Effective chemotherapy reduces infectivity within:", options: ["Days to a few weeks", "6 months", "One year", "Immediately"], ans: 0 },
+                { q: "Bovine TB is usually acquired from:", options: ["Inhalation from cattle", "Unpasteurized milk", "Raw vegetables", "Mosquito bite"], ans: 1 },
+                { q: "Which age group has the highest risk of developing TB after infection?", options: ["Children <3 years", "Adults 20-30 years", "Elderly >80 years", "Adolescents 10-19"], ans: 0 },
+                { q: "What is the infectious dose of TB?", options: ["High (>1000 bacilli)", "Low (small number of bacilli)", "Only after repeated exposure", "Dose not relevant"], ans: 1 },
+                { q: "The DOTS strategy includes all EXCEPT:", options: ["Political commitment", "Quality-assured sputum microscopy", "Standardized short-course chemotherapy", "Surgical treatment"], ans: 3 },
+                { q: "How many sputum specimens are recommended for initial diagnosis?", options: ["One", "Two", "Three", "Five"], ans: 2 },
+                { q: "The preferred mode of TB care under NTP is:", options: ["Hospitalization", "Domiciliary (home) treatment with DOT", "Long-term sanatorium", "Surgical resection"], ans: 1 },
+                { q: "Directly Observed Treatment (DOT) means:", options: ["Patient watches the nurse", "Patient swallows drugs in front of a treatment partner", "Daily phone call", "Monthly check-up only"], ans: 1 }
+            ] },
+            clinical: { title: "Clinical & Diagnosis", next: "treatment", questions: [
+                { q: "The most important screening symptom for TB is:", options: ["Hemoptysis", "Cough of 2 weeks or more", "Fever", "Weight loss"], ans: 1 },
+                { q: "The primary diagnostic tool for pulmonary TB in the NTP is:", options: ["Chest X-ray", "Tuberculin skin test", "Direct Sputum Smear Microscopy (DSSM)", "PCR"], ans: 2 },
+                { q: "What does 'smear-positive' TB indicate?", options: ["AFB seen on sputum microscopy", "Positive culture", "Abnormal X-ray", "Positive Mantoux"], ans: 0 },
+                { q: "A patient is considered a TB symptomatic if cough duration is:", options: [">1 week", "≥2 weeks", ">1 month", "any duration with blood"], ans: 1 },
+                { q: "Which of the following is a systemic symptom of TB?", options: ["Chest pain", "Night sweats", "Cough only", "Hemoptysis"], ans: 1 },
+                { q: "For sputum smear-negative but CXR suggestive of TB, diagnosis is made by:", options: ["TB Diagnostic Committee (TBDC)", "Culture alone", "Clinical judgment only", "Repeat CXR"], ans: 0 },
+                { q: "Rusty sputum in TB is due to:", options: ["Mucus", "Blood (hemoptysis)", "Pus", "Food residue"], ans: 1 },
+                { q: "Extrapulmonary TB is most commonly seen in:", options: ["Bones", "Lymph nodes", "Liver", "Kidneys"], ans: 1 },
+                { q: "Which of the following is NOT a sign of TB?", options: ["Persistent cough", "Unexplained weight loss", "Polyuria", "Fever"], ans: 2 },
+                { q: "A positive tuberculin skin test indicates:", options: ["Active TB", "Latent infection or previous BCG", "Immunity to TB", "Need for isolation"], ans: 1 }
+            ] },
+            treatment: { title: "Treatment & DOTS Regimens", next: "prevention", questions: [
+                { q: "Category I regimen for new smear-positive TB consists of:", options: ["2HRZE/4HR", "2HRZES/1HRZE/5HRE", "2H3R3Z3E3/4H3R3", "6HR"], ans: 0 },
+                { q: "The drug 'R' in TB regimen stands for:", options: ["Rifampicin", "Ribavirin", "Ritonavir", "Rifaximin"], ans: 0 },
+                { q: "Pyrazinamide is primarily active during which phase?", options: ["Continuation", "Intensive", "Both", "Only in retreatment"], ans: 1 },
+                { q: "For Category II (relapse) patients, the continuation phase duration is:", options: ["4 months", "5 months", "6 months", "8 months"], ans: 1 },
+                { q: "Fixed-dose combinations (FDCs) are preferred because:", options: ["They are cheaper", "They reduce pill burden and prevent monotherapy", "They have fewer side effects", "They are injectable"], ans: 1 },
+                { q: "What is the most common cause of treatment failure?", options: ["Drug resistance", "Poor adherence (default)", "Severe disease", "Age"], ans: 1 },
+                { q: "Which drug is contraindicated in pregnancy?", options: ["Isoniazid", "Rifampicin", "Streptomycin", "Ethambutol"], ans: 2 },
+                { q: "Red-orange discoloration of body fluids is caused by:", options: ["Isoniazid", "Rifampicin", "Pyrazinamide", "Ethambutol"], ans: 1 },
+                { q: "Chronic TB (still smear-positive after re-treatment) should be:", options: ["Re-treated with same regimen", "Refer to DOTS Plus / MDR-TB facility", "Given second-line injectables immediately", "Discontinued"], ans: 1 },
+                { q: "The minimum duration of DOT per week is:", options: ["Once a week", "Three times a week (thrice weekly regimen possible)", "Every other day", "Monthly"], ans: 1 }
+            ] },
+            prevention: { title: "Prevention & BCG", next: "phn", questions: [
+                { q: "BCG vaccine is given to:", options: ["All adults", "All infants at birth", "Only high-risk children", "Pregnant women"], ans: 1 },
+                { q: "BCG protects primarily against:", options: ["Pulmonary TB", "Miliary TB and TB meningitis", "Extrapulmonary TB only", "Latent TB"], ans: 1 },
+                { q: "What is the protective efficacy of BCG against TB meningitis?", options: ["30%", "50%", "64%", "95%"], ans: 2 },
+                { q: "Isoniazid preventive therapy (IPT) is recommended for:", options: ["All adult contacts", "Child contacts <5 years with negative CXR", "All sputum-positive patients", "Pregnant women"], ans: 1 },
+                { q: "Which is the most effective infection control measure in health facilities?", options: ["UV lamps", "N95 masks", "Natural ventilation and source control (cough etiquette)", "Antibiotics"], ans: 2 },
+                { q: "A TB patient who misses treatment for ≥2 months is considered:", options: ["Cured", "Defaulted", "Treatment failure", "Relapse"], ans: 1 },
+                { q: "Household contacts of a smear-positive TB patient should be:", options: ["Isolated", "Evaluated for TB symptoms and offered screening", "Given BCG again", "Given prophylactic antibiotics"], ans: 1 },
+                { q: "The single most effective way to prevent new infections is:", options: ["BCG", "Early diagnosis and treatment of infectious cases", "Wearing masks", "Isolation of all patients"], ans: 1 },
+                { q: "Which of the following is NOT a false contraindication to BCG?", options: ["Malnutrition", "Low-grade fever", "HIV/AIDS with severe immunosuppression (true contraindication)", "Mild respiratory infection"], ans: 2 },
+                { q: "BCG scar should be checked at ___ months of age.", options: ["1-2", "3-4", "6-12", "18-24"], ans: 2 }
+            ] },
+            phn: { title: "PHN Role & Nursing Care", next: "mnemonics", questions: [
+                { q: "The PHN supervises the treatment of TB patient through:", options: ["Monthly visits", "Directly Observed Therapy (DOT)", "Telephone reminders", "Mailing drugs"], ans: 1 },
+                { q: "The TB Register is maintained at the:", options: ["Provincial Health Office", "RHU / Health Center", "National level", "Hospital only"], ans: 1 },
+                { q: "A treatment partner can be:", options: ["Only a nurse", "A midwife, BHW, family member", "A doctor", "A barangay captain only"], ans: 1 },
+                { q: "PHN should collect sputum specimens from a TB suspect:", options: ["Once", "Three times (on‑site, morning, next day)", "Five times", "Only if CXR positive"], ans: 1 },
+                { q: "When a patient fails to collect their medicine for 1 month, the PHN should:", options: ["Mark as cured", "Conduct defaulter tracing and home visit", "Discharge the patient", "Stop treatment"], ans: 1 },
+                { q: "Childhood TB diagnosis requires at least ___ of the following: exposure, symptoms, positive tuberculin, abnormal CXR.", options: ["2", "3", "1", "4"], ans: 1 },
+                { q: "The recommended interval for re‑reading tuberculin test is:", options: ["24-48 hours", "48-72 hours", "One week", "Immediate"], ans: 1 },
+                { q: "Which report is submitted quarterly by the PHO to DOH?", options: ["TB Register summary", "Quarterly accomplishment report for NTP", "FHSIS M‑1", "BCG coverage report"], ans: 1 },
+                { q: "A patient with adverse reaction to FDC (e.g., hepatotoxicity) should:", options: ["Stop all drugs", "Switch to single drug formulation (SDF) under medical guidance", "Continue same", "Increase dose"], ans: 1 },
+                { q: "The PHN should ensure that a food handler with TB:", options: ["Never return to work", "Return after consecutive negative sputum smears and completion of treatment", "Return immediately with mask", "Never be hired"], ans: 1 }
+            ] }
+        };
+        // Build final 50-item exam (combine all section questions)
+        let finalQ = [];
+        for (let sec of ['overview','transmission','clinical','treatment','prevention','phn']) {
+            finalQ = finalQ.concat(quizzes[sec].questions);
+        }
+        while(finalQ.length < 50) finalQ.push({ q: "Which drug is part of intensive phase for new TB patients?", options: ["Streptomycin", "Pyrazinamide", "Amikacin", "Ciprofloxacin"], ans: 1 });
+        quizzes['final_quiz'] = { title: "Final 50-Item Exam: Tuberculosis", next: null, questions: finalQ };
+
+        function unlockFirstSection() { if(!unlockedSections.includes('overview')) { unlockedSections.push('overview'); updateSidebarUI(); } showSection('overview'); }
+        function showSection(id) {
+            if (!unlockedSections.includes(id) && id !== 'home') { alert("Please pass the quiz at the end of the previous section."); return; }
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => { btn.classList.remove('bg-tb-light','text-tb-dark','border-r-4','border-tb-dark'); btn.classList.add('text-slate-600'); });
+            const active = document.getElementById('btn-'+id); if(active) active.classList.add('bg-tb-light','text-tb-dark','border-r-4','border-tb-dark');
+            if(window.innerWidth<768) document.getElementById('sidebar').classList.add('hidden');
+            document.querySelector('main').scrollTop = 0;
+        }
+        function updateSidebarUI() {
+            ['home','overview','transmission','clinical','treatment','prevention','phn','mnemonics','final_quiz_sec'].forEach(sec=>{
+                const btn = document.getElementById('btn-'+sec); if(!btn) return;
+                const lock = btn.querySelector('.fa-lock'), icon = btn.querySelector('.nav-icon');
+                if(unlockedSections.includes(sec) || sec==='home') { btn.classList.remove('locked-section'); if(lock) lock.classList.add('hidden'); if(icon) icon.classList.remove('hidden'); }
+                else { btn.classList.add('locked-section'); if(lock) lock.classList.remove('hidden'); if(icon) icon.classList.add('hidden'); }
+            });
+        }
+        let currentQuiz = null;
+        function openQuiz(sectionId) {
+            currentQuiz = sectionId; const qd = quizzes[sectionId]; if(!qd) return;
+            document.getElementById('quiz-title').innerText = qd.title;
+            const container = document.getElementById('quiz-questions-container'); container.innerHTML = '';
+            qd.questions.forEach((q,idx)=>{
+                let html = `<div class="bg-slate-50 p-4 rounded-xl border mb-4" id="quiz-q-${idx}"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2">`;
+                q.options.forEach((opt,oi)=>{ html += `<label class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-tb"><span>${opt}</span></label>`; });
+                html += `</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML += html;
+            });
+            document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            document.getElementById('quiz-result-container').classList.add('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
+        }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() {
+            const qd = quizzes[currentQuiz]; if(!qd) return;
+            let score = 0;
+            for(let i=0;i<qd.questions.length;i++) {
+                const sel = document.querySelector(`input[name="q${i}"]:checked`);
+                const isCorrect = sel && parseInt(sel.value) === qd.questions[i].ans;
+                if(isCorrect) score++;
+                const fbDiv = document.querySelector(`.feedback-${i}`);
+                if(fbDiv) {
+                    fbDiv.classList.remove('hidden');
+                    const correctAns = qd.questions[i].options[qd.questions[i].ans];
+                    if(isCorrect) fbDiv.innerHTML = `<span class="text-green-700"><i class="fa-regular fa-circle-check"></i> Correct</span>`;
+                    else fbDiv.innerHTML = `<span class="text-red-700"><i class="fa-regular fa-circle-xmark"></i> Incorrect. Correct: ${correctAns}</span>`;
+                }
+            }
+            const percent = (score/qd.questions.length)*100;
+            const resultDiv = document.getElementById('quiz-result-container');
+            const btn = document.getElementById('quiz-submit-btn'); btn.classList.add('hidden'); resultDiv.classList.remove('hidden');
+            if(percent>=80) {
+                if(currentQuiz === 'final_quiz') {
+                    resultDiv.innerHTML = `<div class="text-amber-500 text-6xl text-center mb-2">🏆</div><h3 class="text-2xl font-black text-center">TB Mastery!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="closeQuiz()" class="mt-4 w-full bg-slate-800 text-white py-2 rounded-lg">Close Exam</button>`;
+                    return;
+                }
+                if(qd.next && !unlockedSections.includes(qd.next)) { unlockedSections.push(qd.next); if(qd.next === 'mnemonics') unlockedSections.push('final_quiz_sec'); updateSidebarUI(); }
+                resultDiv.innerHTML = `<div class="text-green-600 text-5xl text-center mb-2">✓</div><h3 class="text-2xl font-black text-center">Passed!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="closeQuiz(); showSection('${qd.next}')" class="mt-4 w-full bg-green-600 text-white py-2 rounded-lg">Unlock Next Section</button>`;
+            } else {
+                resultDiv.innerHTML = `<div class="text-red-500 text-5xl text-center mb-2">✗</div><h3 class="text-2xl font-black text-center">Failed</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%) - need 80%</p><button onclick="openQuiz('${currentQuiz}')" class="mt-4 w-full bg-slate-600 text-white py-2 rounded-lg">Try Again</button>`;
+            }
+        }
+        function toggleRecallMode() {
+            const active = !document.body.classList.contains('recall-mode');
+            const toggle = document.getElementById('recall-toggle'), knob = document.getElementById('recall-knob');
+            if(active) { document.body.classList.add('recall-mode'); toggle.classList.add('bg-tb-dark'); knob.classList.add('translate-x-6'); }
+            else { document.body.classList.remove('recall-mode'); toggle.classList.remove('bg-tb-dark'); knob.classList.remove('translate-x-6'); }
+        }
+        function toggleMobileMenu() { const s = document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded', ()=>{
+            updateSidebarUI();
+            document.querySelectorAll('.reveal-text').forEach(el=>el.addEventListener('click',function(){ if(document.body.classList.contains('recall-mode')) this.classList.toggle('revealed'); }));
+            const flipCard = document.getElementById('flipCardDOTS'); if(flipCard) flipCard.addEventListener('click',()=>flipCard.classList.toggle('flipped'));
+        });
+    </script>
+</body>
+</html>
